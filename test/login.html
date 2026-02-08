@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>A+SIS</title>
+    <!-- Bootstrap CSS -->
+    <link id="bootstrapCdnLink" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Frontend API wrapper (tries backend at http://localhost:3000) -->
+    <script>window.USE_API = true; window.__API_BASE_URL = 'http://localhost:3000';</script>
+    <script src="frontend/api.js"></script>
+    <script>
+      (function(){
+        // Some browsers (Tracking Protection) block access to cross-origin stylesheet objects.
+        // Try to access the stylesheet; sif it throws or is unavailable, load a local fallback.
+        try {
+          var link = document.getElementById('bootstrapCdnLink');
+          if (!link) throw new Error('cdn link missing');
+          // Accessing .sheet may throw under strict tracking protection in some browsers
+          var sh = link.sheet;
+          if (!sh) throw new Error('no sheet');
+        } catch (e) {
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = 'assets/css/bootstrap.min.css';
+          l.onload = function(){ console.info('Loaded local Bootstrap CSS fallback'); };
+          l.onerror = function(){ console.warn('Failed to load local Bootstrap CSS fallback'); };
+          document.head.appendChild(l);
+          window.__bootstrapCssFallback = true;
+        }
+      })();
+    </script>
+<style>
+ 
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        background-color: #f4f7f6; /*  background */
+        color: #222222;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        position: relative;
+        top: 0;
+        width: 100%;
+        
+        background: #007bff; /* Primary Blue */
+        color: #fff;
+        padding: 15px 30px; /* look */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid #0056b3;
+      }
+      header .logo {
+        font-size: 28px;
+        font-weight: 600;
+      }
+      header nav {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      header nav a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 16px;
+        padding: 8px 15px;
+        border-radius: 6px;
+        transition: background 0.3s, color 0.3s;
+      }
+      header nav a:hover {
+        background: #0056b3; /* Darker blue on hover */
+        color: #fff;
+      }
+      header .user-greeting {
+        font-size: 16px;
+        font-weight: 500;
+      }
+      
+      .menu-icon {
+        display: none;
+        font-size: 36px; 
+        cursor: pointer;
+        color: white;
+        padding: 0 10px;
+      }
+      footer {
+        background: #333;
+        color: #ccc;
+        padding: 15px 20px;
+        text-align: center;
+        margin-top: auto;
+        font-size: 14px;
+        border-top: 5px solid #007bff; /* Blue accent line */
+      }
+      footer a {
+        color: #4da8ff;
+        text-decoration: none;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .sign-out-btn {
+        background: #d9534f;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .container {
+        display: block;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 18px;
+        padding: 10px;
+        border-collapse: separate;
+        flex: 1;
+      }
+      
+      .card {
+        background: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        flex: 1 1 360px;
+        min-width: 320px;
+        margin-bottom: 20px;
+      }
+      h1,
+      h2 {
+        margin: 4px 0 12px 0;
+      }
+      label {
+        display: block;
+        margin-top: 8px;
+        font-size: 14px;
+      }
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 6px;
+        box-sizing: border-box;
+        border-radius: 6px;
+        border: 1px solid #cfd8dc;
+        font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      input:focus, select:focus, textarea:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        outline: none;
+      }
+      button.primary {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      button.primary:hover {
+        background: #0056b3;
+      }
+      button.secondary {
+        background: #6c757d;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      
+      .actions-cell {
+        white-space: normal;
+        max-width:  50px;
+        border-radius: 40px;
+      }
+      .actions-cell button {
+        margin: 1px;
+        padding: 2px 6px;
+        font-size: 12px;
+      }
+      .summary-label {
+          background: #f8f9fa;
+          font-weight: bold;
+          text-align: left;
+          padding-left: 10px;
+      }
+      .summary-value {
+          background: #f8f9fa;
+          font-weight: bold;
+      }
+      .status-pass {
+        color: green;
+        font-weight: bold;
+      }
+      .status-fail {
+        color: red;
+        font-weight: bold;
+      }
+      .comment-block {
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        border-radius: 6px;
+        margin-top: 8px;
+      }
+      .response {
+        background: #e8f4ff;
+        padding: 8px;
+        border-left: 4px solid #007bff;
+        border-radius: 4px;
+      }
+      small.hint {
+        color: #666;
+        display: block;
+        margin-top: 6px;
+      }
+      .inline {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .small-input {
+        width: 120px;
+      }
+
+      .login-container {
+        max-width: 420px;
+        margin: 60px auto;
+        padding: 40px;
+        background-color: #ffffff;
+        border-radius: 1px;
+        border-style: groove;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+        border: none;
+        transition: transform 0.3s ease-in-out;
+        /* Login background image imitation/placeholder */
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="%23f8f9fa" d="M0 100 V50 Q50 20 100 50 V100 Z"/></svg>');
+        background-size: 100% 100px;
+        background-position: bottom;
+        background-repeat: no-repeat;
+      }
+
+      .login-container:hover {
+          transform: translateY(-5px);
+      }
+
+      .login-title {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 30px; /* Larger Title */
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+      }
+      
+      .login-title b {
+          font-weight: 600;
+          color: #007bff;
+      }
+      
+      .login-container input[type="text"],
+      .login-container input[type="password"] {
+          background-color: #f8f9fa;
+          border: 1px solid #ced4da;
+          padding: 12px;
+      }
+      
+      .login-container input:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+      }
+
+      .login-container button.primary {
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: background-color 0.2s, transform 0.2s;
+      }
+      
+      .login-container button.primary:hover {
+        transform: translateY(-2px);
+      }
+
+       .login-container button.secondary {
+        background: #6c757d;
+        transition: background-color 0.2s;
+      }
+
+      .login-container button.secondary:hover {
+        background: #5a6268;
+      }
+
+      .hidden {
+        display: none;
+      }
+      .credential-box {
+        background: #dff0d8;
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+      .average-column {
+        display: none;
+      }
+      fieldset {
+        border: 1px solid #cfd8dc;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+      }
+      legend {
+        font-weight: bold;
+        color: #007bff;
+        padding: 0 5px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .search-bar {
+        margin-bottom: 15px;
+      }
+      .search-bar input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+      }
+     
+      details > summary {
+        padding: 10px;
+        background-color: #f1f1f1;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 15px;
+      }
+      details[open] > summary {
+        background-color: #007bff;
+        color: white;
+      }
+     
+      .bulk-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 15px;
+        /* Changed from fixed width to be responsive */
+        max-width: 100%;
+        width: auto;
+        flex-wrap: wrap;
+      }
+      input[type="checkbox"] {
+        width: auto;
+        margin: 0 5px 0 0;
+      }
+      .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+      }
+      .checkbox-group div {
+        display: flex;
+        align-items: center;
+      }
+     
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+      }
+      .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .item-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 10px;
+      }
+      .item-tag {
+          background-color: #e9ecef;
+          padding: 5px 10px;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+      }
+      .item-tag .remove-btn {
+          cursor: pointer;
+          color: #d9534f;
+          font-weight: bold;
+      }
+       
+      .details-modal-content p {
+        margin: 8px 0;
+        line-height: 1.5;
+      }
+      .details-modal-content p strong {
+        display: inline-block;
+        width: 150px;
+        color: #555;
+      }
+
+      .filter-controls {
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
+          align-items: center;
+          margin-bottom: 15px;
+          background-color: #f8f9fa;
+          padding: 10px;
+          border-radius: 8px;
+      }
+      .filter-controls label {
+          margin-top: 0;
+          font-weight: bold;
+      }
+      .filter-controls select {
+          width: 200px;
+          margin-top: 0;
+      }
+      
+      #reportModal .modal-content, #transcriptContainer .modal-content {
+          max-width: 800px;
+      }
+      #transcriptContainer .table { font-size: 12px; }
+      #transcriptContainer .table th, #transcriptContainer .table td { padding: 0.4rem; text-align: center; }
+      #transcriptContainer .table thead th { background-color: #f1f1f1; }
+      #transcriptContainer .table tfoot td { font-weight: bold; background-color: #f8f9fa; }
+
+      /* --- TABLE & BUTTON SIZE REFINEMENTS --- */
+      .table td, .table th {
+        font-size: 14px;
+        padding: 0.5rem;
+        vertical-align: middle;
+      }
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      /* --- DASHBOARD LAYOUT STYLES --- */
+      .dashboard-page-container {
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        width: 100%;
+      }
+      .dashboard-layout {
+        display: flex;
+        min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+      }
+      .dashboard-menu-icon {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 10px 15px;
+        background-color: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .dashboard-nav {
+        flex: 0 0 260px; /* Left nav width */
+        background-color: rgba(0, 123, 255, 0.25); /* Moderate cool background for side nav */
+        border-right: 1px solid hwb(308 87% 10%);
+        padding: 15px;
+      }
+      .dashboard-nav h3 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+        color: #007bff;
+      }
+      .dashboard-nav .nav-button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 5px;
+        text-align: left;
+        background-color: transparent;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s, color 0.2s;
+        color: #333;
+      }
+      .dashboard-nav .nav-button:hover {
+        background-color: #e9ecef;
+        color: #007bff;
+      }
+      .dashboard-nav .nav-button.active {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .dashboard-nav .nav-button svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 1.5;
+        flex-shrink: 0;
+        /* Attractive color for icons */
+        stroke: #333; 
+        fill: none;
+      }
+      .dashboard-nav .nav-button.active svg {
+        stroke: white; 
+      }
+      .dashboard-content {
+        flex-grow: 1;
+        padding: 20px;
+        background-color: #ffffff;
+        overflow-y: auto;
+      }
+      .dashboard-content .content-section .card {
+        margin-bottom: 0; /* Remove double margin */
+      }
+      
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      /* New photo/profile styling */
+      .profile-photo {
+          width: 120px;
+          height: 160px; /* Approximate 3:4 ratio */
+          object-fit: cover;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          margin-bottom: 15px;
+          display: block;
+      }
+      .default-photo {
+          background-color: #f0f0f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #999;
+          font-size: 10px;
+          text-align: center;
+          line-height: 1.2;
+      }
+      /* End New photo/profile styling */
+
+      @media (max-width: 900px) {
+        .menu-icon { display: block; }
+        header nav {
+            display: none; 
+            position: absolute;
+            top: 100%; left: 0; width: 100%;
+            background-color: #333; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            flex-direction: column;
+        }
+        header nav.active { display: flex; }
+        header nav a { text-align: center; padding: 15px; border-bottom: 1px solid #4a4a4a; }
+       
+        /* Dashboard mobile layout */
+        .dashboard-layout {
+          flex-direction: column;
+        }
+        .dashboard-menu-icon {
+          display: block; /* Show hamburger icon */
+        }
+        .dashboard-nav {
+          position: fixed;
+          left: -280px; /* Hide off-screen */
+          top: 60px; /* Adjust based on header height */
+          height: calc(100% - 60px);
+          width: 260px;
+          z-index: 1500;
+          transition: left 0.3s ease-in-out;
+          overflow-y: auto;
+          box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        }
+        .dashboard-nav.open {
+          left: 0; /* Slide in */
+        }
+        .dashboard-content {
+          padding: 10px;
+        }
+        .filter-controls { flex-direction: column; align-items: stretch; }
+        .filter-controls select { width: 100%; }
+      }
+      
+      @media (max-width: 600px) {
+        body { font-size: 14px; }
+        header .logo { font-size: 15px; }
+        .top-bar { flex-direction: column; align-items: flex-start; }
+        .card { padding: 12px; }
+        h1 { font-size: 24px; }
+        .login-container { 
+          margin: 20px 10px; 
+          padding: 25px; /* Reduced padding for small screens */
+        }
+        .login-container button {
+          width: 100%; /* Make buttons full-width inside login form */
+        }
+        button { padding: 10px; }
+        .modal-content { width: 95%; margin: 10% auto; }
+      }
+    
+</style>
+    
+  </head>
+  <body>
+    <header>
+      <div class="logo">A<SUP>+</SUP>SIS</div>
+      <div class="user-greeting" id="userGreeting"></div>
+      <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+      <nav id="headerNav"></nav>
+    </header>
+    
+    <div id="loginPage" class="login-container">
+      <h1 class="login-title"><b> login</b> System</h1>
+      <form id="loginForm" onsubmit="login(event)">
+        <label for="username">Username:</label><input type="text" id="username" required />
+        <label for="password">Password:</label><input type="password" id="password" required />
+        
+        <button type="submit" id="loginSubmitBtn" class="primary">Login</button>  
+      </form>
+      <!-- Forgot links removed per request -->
+      <div id="loginMessage" style="margin-top: 15px; color: red"></div>
+    </div>
+
+    <!-- Initial Admin Signup (shown when default admin account exists) -->
+    <div id="signupPage" class="login-container hidden">
+      <h1 class="login-title">Initial Admin Setup</h1>
+      <form id="adminSignupForm">
+        <label for="adminFirst">First Name:</label>
+        <input type="text" id="adminFirst" oninput="enforceNoNumbers(event)" required />
+        <label for="adminMiddle">Middle Name:</label>
+        <input type="text" id="adminMiddle" oninput="enforceNoNumbers(event)" />
+        <label for="adminLast">Last Name:</label>
+        <input type="text" id="adminLast" oninput="enforceNoNumbers(event)" required />
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button type="button" id="createAdminBtn" class="primary">Create Account</button>
+        </div>
+      </form>
+      <div id="signupResult" class="hidden" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Info Pages (Hidden by default, used when not logged in) -->
+    <div id="homePage" class="container hidden">
+        <div class="card" style="max-width: 700px; margin: 40px auto;">
+            <h2>Student Information System</h2>
+            <p>This portal is designed to streamline academic and administrative tasks for students, teachers, and school staff.</p>
+            <p>Please use the Login or Enrollment Request links to access your functions.</p>
+        </div>
+    </div>
+    <div id="aboutPage" class="container hidden">
+        <div class="card" style="max-width: 700px; margin: 40px auto;">
+            <h2>About This System</h2>
+            <p>The system provides a centralized platform for student registration, score entry, gradebook management, student promotion, transcript generation, and system administration.</p>
+            <p>It aims to improve efficiency and transparency in managing high school academic records.</p>
+        </div>
+    </div>
+    <div id="contactPage" class="container hidden">
+        <div class="card" style="max-width: 700px; margin: 40px auto;">
+            <h2>Contact Information</h2>
+            <p>For technical support, please contact the System Administrator.</p>
+            <p>For enrollment inquiries, please contact the Registrar's Office.</p>
+            <p><strong>Email:</strong> support@schoolsystem.edu</p>
+            <p><strong>Phone:</strong> +251 9XX XXX XXXX</p>
+        </div>
+    </div>
+    
+    <div id="enrollmentChoicePage" class="container hidden">
+        <div class="card" style="max-width: 500px; margin: 40px auto;">
+            <h2>Choose Enrollment Type</h2>
+            <p>Are you a student or a teacher? Please select the appropriate option to begin your enrollment request.</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="studentEnrollmentChoiceBtn" class="primary" onclick="showPage('studentEnrollmentPage')">Enroll as Student</button>
+                <button id="teacherEnrollmentChoiceBtn" class="primary" onclick="showPage('teacherEnrollmentPage')">Enroll as Teacher</button>
+            </div>
+             <button class="secondary" style="margin-top: 15px;" onclick="showPage('loginPage')">Back to Login</button>
+        </div>
+    </div>
+
+    <div id="studentEnrollmentPage" class="container hidden">
+       <div class="card" style="max-width: 700px; margin: auto;">
+            <h2>Student Enrollment Request</h2>
+            <p>Please fill out the form below. An administrator will review your request.</p>
+            <form onsubmit="submitStudentEnrollment(event)">
+                <fieldset><legend>Personal Details</legend>
+                  <div class="form-group"><label>First Name:</label><input type="text" id="enrollFirstName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Middle Name:</label><input type="text" id="enrollMiddleName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Last Name:</label><input type="text" id="enrollLastName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Student Gender:</label><select id="enrollGender" required><option value="">Select Gender</option><option>Male</option><option>Female</option></select></div>
+                  <div class="form-group"><label>Nationality:</label><input type="text" id="enrollNationality" placeholder=" Ethiopian" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>School Name:</label><input type="text" id="enrollSchoolName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Age:</label><input type="number" id="enrollAge" min="13" max="25" required /></div> <!-- Changed from DOB to Age -->
+                  <div class="form-group"><label>3x4 Photo (Optional):</label><input type="file" id="enrollStudentPhoto" accept="image/*" /></div>
+                </fieldset>
+                <fieldset><legend>Address Information</legend>
+                  <div class="form-group"><label>Region:</label><input type="text" id="enrollRegion" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Zone:</label><input type="text" id="enrollZone" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Woreda:</label><input type="text" id="enrollWoreda" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Kebele:</label><input type="text" id="enrollKebele" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Contact Information</legend>
+                  <div class="form-group"><label>Parent Name:</label><input type="text" id="enrollParentName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Parent Phone Number:</label><input type="tel" id="enrollParentPhone" pattern="[0-9]{10}" oninput="enforceOnlyNumbers(event)" required /></div>
+                  <!-- Parent Email removed -->
+                  <div class="form-group"><label>Emergency Name:</label><input type="text" id="enrollEmergencyName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Emergency Contact Phone:</label><input type="tel" id="enrollEmergencyPhone" pattern="[0-9]{10}" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Academic Information</legend>
+                  <div class="form-group">
+                    <label>Grade to Enroll In:</label>
+                    <select id="enrollGrade" onchange="handleEnrollmentGradeSelection(this)" required>
+                        <option value="">Select Grade</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Section:</label>
+                    <select id="enrollSection" required>
+                        <option value="">-- Select Grade First --</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>Registration Year:</label><input type="number" id="enrollYear" placeholder="" required /></div>
+                  <div id="grade8ScoreEnrollmentContainer" class="form-group hidden">
+                    <label>Grade 8 National Exam Score (Required for Grade 9):</label>
+                    <input type="number" id="enrollGrade8Score" min="0" max="100" />
+                  </div>
+                </fieldset>
+                <button type="reset" class="secondary">Clear Form</button>
+                <button type="submit" class="primary">Submit Enrollment Request</button>
+                <button type="button" class="secondary" onclick="showPage('loginPage')">Cancel</button>
+                <div id="studentEnrollMsg" style="margin-top: 8px;"></div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="teacherEnrollmentPage" class="container hidden">
+       <div class="card" style="max-width: 700px; margin: auto;">
+           <h2>Teacher Enrollment Request</h2>
+           <p>Please fill out the form below. An administrator will review your request.</p>
+           <form onsubmit="submitTeacherEnrollment(event)">
+                <fieldset><legend>Personal Details</legend>
+                    <div class="form-group"><label>First Name:</label><input type="text" id="enrollTeacherFirstName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Middle Name:</label><input type="text" id="enrollTeacherMiddleName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Last Name:</label><input type="text" id="enrollTeacherLastName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Gender:</label><select id="enrollTeacherGender" required><option value="">Select Gender</option><option>Male</option><option>Female</option></select></div>
+                    <div class="form-group"><label>Nationality:</label><input type="text" id="enrollTeacherNationality" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>3x4 Photo (Optional):</label><input type="file" id="enrollTeacherPhoto" accept="image/*" /></div>
+                </fieldset>
+                <fieldset><legend>Address Information</legend>
+                    <div class="form-group"><label>Region:</label><input type="text" id="enrollTeacherRegion" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Zone:</label><input type="text" id="enrollTeacherZone" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Woreda:</label><input type="text" id="enrollTeacherWoreda" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Kebele:</label><input type="text" id="enrollTeacherKebele" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Contact & School Information</legend>
+                    <div class="form-group"><label>Email:</label><input type="email" id="enrollTeacherEmail" required /></div>
+                    <div class="form-group"><label>Phone Number:</label><input type="tel" id="enrollTeacherPhone" pattern="[0-9]{10}" oninput="enforceOnlyNumbers(event)" required /></div>
+                    <div class="form-group"><label>School Name:</label><input type="text" id="enrollTeacherSchoolName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Primary Subject Specialty:</label><input type="text" id="enrollTeacherSubject" placeholder="e.g., Mathematics, Physics" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Registration Year:</label><input type="number" id="enrollTeacherYear" placeholder="e.g., 2024" required /></div>
+                </fieldset>
+                <button type="reset" class="secondary">Clear Form</button>
+                <button type="submit" class="primary">Submit Enrollment Request</button>
+                <button type="button" class="secondary" onclick="showPage('loginPage')">Cancel</button>
+                <div id="teacherEnrollMsg" style="margin-top: 8px;"></div>
+           </form>
+       </div>
+    </div>
+    
+    <!-- TEACHER DASHBOARD -->
+    <div id="teacherPage" class="hidden dashboard-page-container">
+      <div class="top-bar"><h1>Teacher Dashboard</h1></div>
+      <div class="dashboard-menu-icon" onclick="toggleDashboardMenu('teacherDashboardNav')">&#9776; Menu</div>
+      <div class="dashboard-layout">
+        <nav class="dashboard-nav" id="teacherDashboardNav">
+          <h3>Teacher Menu</h3>
+          <button class="nav-button" onclick="showTeacherSection('teacherProfileSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+             My Profile
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherHomeroomSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+             Homeroom Dashboard
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherScoreEntrySection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s5.333-6 10-6 10 6 10 6-5.333 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="3"/><line x1="16" y1="12" x2="21" y2="12"/><line x1="3" y1="12" x2="8" y2="12"/></svg>
+             Enter Scores
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherGradebookSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+             Gradebook Entry
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherBehaviorSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+             Assign Behavior
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherCommentsSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+             Pending Comments
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherAnnouncementSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+             Post Announcement
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherFinalReportSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+             Final Semester Report
+          </button>
+          <button class="nav-button" onclick="showTeacherSection('teacherPasswordSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+             Change Password
+          </button>
+        </nav>
+        <main class="dashboard-content">
+          <div id="teacherInfo" style="margin-bottom: 15px; padding: 10px; background: #e8f4ff; border-radius: 6px;"></div>
+          
+          <div id="teacherProfileSection" class="content-section hidden">
+            <div class="card">
+              <h2>My Profile</h2>
+              <div id="teacherProfileContent"></div>
+            </div>
+          </div>
+
+          <div id="teacherHomeroomSection" class="content-section hidden">
+            <div class="card">
+              <h2>Homeroom Dashboard</h2>
+              <div class="filter-controls">
+                <label for="homeroomClassSelect">Class (Grade/Section):</label>
+                <select id="homeroomClassSelect" onchange="loadHomeroomRoster()"></select>
+                <button class="primary" onclick="loadHomeroomRoster()">Load Dashboard</button>
+              </div>
+              <div id="homeroomDashboardContent" style="margin-top: 15px;">
+                <div id="homeroomStats" class="d-flex justify-content-around mb-4"></div> <!-- NEW STATS CARD CONTAINER -->
+                <div id="homeroomRoster" class="table-responsive"></div>
+                
+                <details><summary>Behavior Incidents</summary><div id="homeroomBehavior" style="padding: 10px;"></div></details>
+                <details><summary>Class Announcements & Assignments</summary><div id="homeroomAnnouncements" style="padding: 10px;"></div></details>
+
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button class="secondary" onclick="exportHomeroomData('roster')">Export Roster (CSV)</button>
+                    <button class="secondary" onclick="exportHomeroomData('grades')">Export Grades (CSV)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="teacherFinalReportSection" class="content-section hidden">
+            <div class="card">
+              <h2>Final Semester Report</h2>
+              <div class="filter-controls">
+                <label for="reportClassSelect">Select Homeroom Class:</label>
+                <select id="reportClassSelect"></select>
+                <label for="reportSemesterSelect">Select Semester:</label>
+                <select id="reportSemesterSelect"><option>Term 1</option><option>Term 2</option></select>
+                <button class="primary" onclick="generateHomeroomReport()">Generate Report</button>
+              </div>
+              <div id="finalReportContainer" style="margin-top: 15px;"></div>
+              <label for="finalReportNotes" style="margin-top:12px; display:block;">Teacher Remarks / Narrative (will be sent to Admin):</label>
+              <textarea id="finalReportNotes" rows="6" style="width:100%; margin-top:6px;" placeholder="Write summary remarks, concerns, recommendations, or any final notes for the administration..."></textarea>
+              <button class="secondary" style="margin-top: 15px;" onclick="sendFinalReportToAdmin()">Send Report to Admin</button>
+            </div>
+          </div>
+
+          <div id="teacherScoreEntrySection" class="content-section">
+            <div class="card">
+              <h2>Enter/Update Scores</h2>
+              <label>Class (Grade & Section):</label><select id="teacherClassSelect" onchange="populateStudentSelects()"></select>
+              <label>Choose Student:</label><div class="inline"><select id="teacherStudentSelect"></select><input id="teacherStudentId" class="small-input" placeholder="Or  ID" /></div>
+              <label>Subject:</label><select id="teacherSubject" disabled></select>
+              <label>Term:</label><select id="teacherTerm"><option>Term 1</option><option>Term 2</option></select>
+              <label>Exam Type:</label><select id="teacherExam"><option>Assignment</option><option>Midterm</option><option>Final</option><option>Quiz</option></select>
+              <label>Score (0–100):</label><input id="teacherScore" type="number" min="0" max="100" />
+              <button type="button" class="secondary" onclick="clearScoreEntryForm()">Clear Selection</button>
+              <button id="submitScoreBtn" class="primary" style="margin-top: 10px">Submit/Update Score</button>
+              <div id="teacherMsg" style="margin-top: 10px; color: green"></div>
+            </div>
+          </div>
+          
+          <div id="teacherGradebookSection" class="content-section hidden">
+            <div class="card">
+              <h2>Gradebook Entry</h2>
+              <label>Class (Grade & Section):</label>
+              <select id="gradebookClassSelect" onchange="loadGradebookUI()"></select>
+              <div style="display: flex; gap: 10px; margin-top: 10px;">
+                  <button class="primary" onclick="loadGradebookUI('scores')">Scores Entry</button>
+                  <button class="secondary" onclick="loadGradebookUI('behavior')">Behavior Entry (Homeroom)</button>
+              </div>
+              <div id="gradebookContainer" style="margin-top: 15px;"></div>
+            </div>
+          </div>
+
+          <div id="teacherBehaviorSection" class="content-section hidden">
+            <div class="card">
+              <h2>Assign Behavior Grade</h2>
+              <p style="color: red;">*Only for your assigned homeroom class.</p>
+              <label>Class (Grade & Section):</label><select id="teacherBehaviorClassSelect" onchange="populateBehaviorStudentSelects()"></select>
+              <label>Choose Student:</label><select id="teacherBehaviorStudentSelect"></select>
+              <label>Behavior Grade (A-E):</label><select id="teacherBehaviorScore"><option value="">Select Behavior Grade</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select>
+              <label>Term:</label><select id="teacherBehaviorTerm"><option>Term 1</option><option>Term 2</option><option value="All">All Terms</option></select>
+              <button id="submitBehaviorBtn" class="primary" style="margin-top: 10px">Submit/Update Behavior Grade</button>
+              <div id="teacherBehaviorMsg" style="margin-top: 10px; color: green"></div>
+            </div>
+          </div>
+          
+          <div id="teacherAnnouncementSection" class="content-section hidden">
+              <div class="card">
+                  <h2>Post Class Announcement</h2>
+                  <label>Select Class:</label>
+                  <select id="announcementClassSelect"></select>
+                  <label>Announcement Message:</label>
+                  <textarea id="announcementMessage" rows="4" placeholder="Enter your announcement here..."></textarea>
+                  <button class="primary" style="margin-top: 10px;" onclick="postAnnouncement()">Post Announcement</button>
+                  <div id="announcementMsg" style="margin-top: 8px;"></div>
+              </div>
+          </div>
+
+          <div id="teacherCommentsSection" class="content-section hidden">
+            <div class="card"><h2>Pending Comments</h2><div id="teacherCommentsContainer"></div></div>
+          </div>
+          
+          <div id="teacherPasswordSection" class="content-section hidden">
+            <div class="card">
+              <h2>Change My Password</h2>
+              <form onsubmit="changePassword(event)">
+                  <label>Current Password:</label><input type="password" id="currentPasswordTeacher" required />
+                  <label>New Password:</label><input type="password" id="newPasswordTeacher" required />
+                  <label>Confirm New Password:</label><input type="password" id="confirmPasswordTeacher" required />
+                  <button type="submit" class="primary" style="margin-top: 10px;">Change Password</button>
+                  <div id="changePasswordMsgTeacher" style="margin-top: 8px;"></div>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <!-- STUDENT DASHBOARD -->
+    <div id="studentPage" class="hidden dashboard-page-container">
+      <div class="top-bar"><h1>Student Dashboard</h1></div>
+      <div class="dashboard-menu-icon" onclick="toggleDashboardMenu('studentDashboardNav')">&#9776; Menu</div>
+      <div class="dashboard-layout">
+        <nav class="dashboard-nav" id="studentDashboardNav">
+          <h3>Student Menu</h3>
+          <button class="nav-button" onclick="showStudentSection('studentProfileSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+             My Profile
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentReportCardSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+             My Report Card
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentTranscriptRequestSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+             Request Transcript
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentScoresSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+             View My MARK
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentAnnouncementsSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8L2 12l4 4"/><path d="M18 8l4 4-4 4"/><path d="M10 20l4-16"/></svg>
+             Announcements
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentBehaviorSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+             My Behavior
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentCommentsSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+             Contact Teachers
+          </button>
+          <button class="nav-button" onclick="showStudentSection('studentPasswordSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+             Change Password
+          </button>
+        </nav>
+        <main class="dashboard-content">
+          <div id="studentProfileSection" class="content-section hidden">
+            <div class="card">
+              <h2>My Profile</h2>
+              <div id="studentProfileContent"></div>
+            </div>
+          </div>
+
+          <div id="studentReportCardSection" class="content-section">
+            <div class="card">
+                <h2>My Complete Report Card</h2>
+                <button onclick="viewAllStudentInfo()" class="primary">View All My Information</button>
+                <div id="studentAllInfoContainer" style="margin-top: 15px;"></div>
+            </div>
+          </div>
+
+          <div id="studentTranscriptRequestSection" class="content-section hidden">
+            <div class="card">
+                <h2>Request Official Transcript</h2>
+                <div id="transcriptRequestStatus" style="margin-bottom: 15px;">
+                    <p>You can request an official transcript which will be processed by the transcript officer. (Eligibility: Grade 12 or Graduated)</p>
+                </div>
+                <label for="transcriptRequestNote">Request Details (optional):</label>
+                <textarea id="transcriptRequestNote" rows="4" placeholder="Provide details for the transcript officer (e.g., purpose, delivery instructions)..." style="width:100%;margin-top:8px"></textarea>
+                <button id="requestTranscriptBtn" class="primary" style="margin-top:8px" onclick="requestOfficialTranscript()">Request Official Transcript</button>
+                <div id="transcriptRequestMessage" style="margin-top: 10px; color: green;"></div>
+                <div id="studentTranscriptsList" style="margin-top: 20px;"></div>
+            </div>
+          </div>
+
+          <div id="studentAnnouncementsSection" class="content-section hidden">
+              <div class="card">
+                  <h2>Class Announcements</h2>
+                  <div id="studentAnnouncementsContainer"><p>No announcements yet.</p></div>
+              </div>
+          </div>
+
+          <div id="studentScoresSection" class="content-section hidden">
+            <div class="card">
+              <h2>View My Scores</h2>
+              <label>Term:</label><select id="viewTerm"><option value="Term 1">Term 1</option><option value="Term 2">Term 2</option><option value="All">All</option></select>
+              <button id="viewScoresBtn" class="primary" style="margin-top: 10px">View Scores</button>
+              <div id="scoresTable" class="table-responsive" style="margin-top: 14px"></div>
+            </div>
+          </div>
+
+          <div id="studentBehaviorSection" class="content-section hidden">
+            <div class="card">
+              <h2>My Behavior Grades</h2>
+              <div style="margin-top:10px;">
+                <button id="viewBehaviorBtn" class="primary">View Behavior Grades</button>
+                <div id="behaviorTable" style="margin-top: 14px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="studentCommentsSection" class="content-section hidden">
+            <div class="card">
+              <h2>Send Comment/Question</h2>
+              <label for="studentCommentSubject">Subject:</label><select id="studentCommentSubject" required><option value="">Select a Subject </option></select>
+              <textarea id="studentComment" rows="3" placeholder="Write your comment or question..."></textarea>
+              <button id="sendCommentBtn" class="primary" style="margin-top: 8px">Send Comment</button>
+              <div id="studentCommentMsg" style="margin-top: 8px; color: green"></div>
+              <h3 style="margin-top: 20px">My Comments</h3>
+              <div id="studentCommentsList"></div>
+            </div>
+          </div>
+          
+          <div id="studentPasswordSection" class="content-section hidden">
+            <div class="card">
+                <h2>Change My Password</h2>
+                <form onsubmit="changePassword(event)">
+                    <label>Current Password:</label><input type="password" id="currentPasswordStudent" required />
+                    <label>New Password:</label><input type="password" id="newPasswordStudent" required />
+                    <label>Confirm New Password:</label><input type="password" id="confirmPasswordStudent" required />
+                    <button type="submit" class="primary" style="margin-top: 10px;">Change Password</button>
+                    <div id="changePasswordMsgStudent" style="margin-top: 8px;"></div>
+                </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <!-- REGISTRAR DASHBOARD -->
+    <div id="registrarPage" class="hidden dashboard-page-container">
+      <div class="top-bar"><h1>Registrar Dashboard</h1><button class="secondary" style="margin-left:12px;" onclick="showContactModal()">Add Contact</button></div>
+      <div class="dashboard-menu-icon" onclick="toggleDashboardMenu('registrarDashboardNav')">&#9776; Menu</div>
+      <div class="dashboard-layout">
+        <nav class="dashboard-nav" id="registrarDashboardNav">
+          <h3>Registrar Menu</h3>
+          <button class="nav-button" onclick="showRegistrarSection('registrarWelcomeSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l-5 5h10l-5-5zM12 22l5-5H7l5 5z"/><path d="M21 12H3"/></svg>
+             Dashboard Home
+          </button>
+          <button class="nav-button" onclick="showRegistrarSection('registrarStudentRegistrationSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="16" y1="11" x2="20" y2="11"/><line x1="18" y1="9" x2="18" y2="13"/></svg>
+             Register Student
+          </button>
+          <button class="nav-button" onclick="showRegistrarSection('registrarTeacherRegistrationSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="16" y1="11" x2="22" y2="17"/><line x1="22" y1="11" x2="16" y2="17"/></svg>
+             Register Teacher
+          </button>
+          <button class="nav-button" onclick="showRegistrarSection('registrarEnrollmentSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+             Enrollment Requests
+          </button>
+          <button class="nav-button" onclick="showRegistrarSection('registrarPromotionSection')">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+             Student Promotion
+          </button>
+        </nav>
+        <main class="dashboard-content">
+          <div id="registrarWelcomeSection" class="content-section">
+            <div class="card">
+              <h2>Welcome, Registrar!</h2>
+              <p>Select an option from the left menu to manage student and teacher registrations, enrollments, and promotions.</p>
+            </div>
+          </div>
+          
+          <div id="registrarStudentRegistrationSection" class="content-section hidden">
+            <div class="card">
+              <h2>Register Student</h2>
+              <form onsubmit="registerStudent(event)">
+                <fieldset><legend>Personal Details</legend>
+                  <div class="form-group"><label>First Name:</label><input type="text" id="firstName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Middle Name:</label><input type="text" id="middleName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Last Name:</label><input type="text" id="lastName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Student Gender:</label><select id="gender" required><option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                  <div class="form-group"><label>Nationality:</label><input type="text" id="nationality" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>School Name:</label><input type="text" id="schoolName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Age:</label><input type="number" id="studentAge" min="13" max="150" required /></div> <!-- Changed from DOB to Age -->
+                  <div class="form-group"><label>3x4 Photo :</label><input type="file" id="studentPhoto" accept="image/*" /></div>
+                </fieldset>
+                <fieldset><legend>Address Information</legend>
+                  <div class="form-group"><label>Region:</label><input type="text" id="region" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Zone:</label><input type="text" id="zone" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Woreda:</label><input type="text" id="woreda" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Kebele:</label><input type="text" id="kebele" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Contact Information</legend>
+                  <div class="form-group"><label>Parent First Name:</label><input type="text" id="parentFirstName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Parent Last Name:</label><input type="text" id="parentLastName" oninput="enforceNoNumbers(event)" required /></div>
+                  
+                  <div class="form-group"><label>Emergency Name:</label><input type="text" id="emergencyName" oninput="enforceNoNumbers(event)" required /></div>
+                  <div class="form-group"><label>Emergency Contact Phone:</label><input type="tel" id="emergencyPhone" pattern="[0-9]{10}" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Academic Information</legend>
+                  <div class="form-group"><label>Enrollment Status:</label><select id="enrollmentStatus" required><option>Active</option><option>Transfer</option><option></option></select></div>
+                  <div class="form-group"><label>Grade:</label><select id="grade" onchange="handleGradeSelection(this)" required></select></div>
+                  <div class="form-group"><label>Registration Year:</label><input type="number" id="year" placeholder="e.g., 2017" required /></div>
+                  <div class="form-group"><label id="grade8ScoreLabel" class="hidden">Grade 8 MARK:</label><input type="number" id="grade8Score" class="hidden" min="0" max="100" /></div>
+                  <div class="form-group"><label id="streamLabel" class="hidden">Stream:</label><select id="stream" class="hidden"><option value="">Select Stream</option><option value="Natural Science">Natural Science</option><option value="Social Science">Social Science</option></select></div>
+                  <div class="form-group section-container"><label>Section:</label><select id="section" required></select></div>
+                  <div class="form-group"><label>Special Notes:</label><textarea id="specialNotes" placeholder="Medical or learning support notes..."></textarea></div>
+                </fieldset>
+                <button type="reset" class="secondary">Clear Form</button>
+                <button type="submit" class="primary" style="margin-top: 10px">Register Student</button>
+                <div id="registerMsg" style="margin-top: 8px; color: green"></div>
+              </form>
+            </div>
+          </div>
+          
+          <div id="registrarTeacherRegistrationSection" class="content-section hidden">
+             <div class="card">
+              <h2>Register New Teacher</h2>
+              <form onsubmit="registerTeacher(event)">
+                 <fieldset><legend>Personal Details</legend>
+                    <div class="form-group"><label>First Name:</label><input type="text" id="teacherFirstName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Middle Name:</label><input type="text" id="teacherMiddleName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Last Name:</label><input type="text" id="teacherLastName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Gender:</label><select id="teacherGender" required><option value="">Select Gender</option><option>Male</option><option>Female</option></select></div>
+                    <div class="form-group"><label>Nationality:</label><input type="text" id="teacherNationality" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>3x4 Photo :</label><input type="file" id="teacherPhoto" accept="image/*" /></div>
+                </fieldset>
+                <fieldset><legend>Address Information</legend>
+                    <div class="form-group"><label>Region:</label><input type="text" id="teacherRegion" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Zone:</label><input type="text" id="teacherZone" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Woreda:</label><input type="text" id="teacherWoreda" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Kebele:</label><input type="text" id="teacherKebele" oninput="enforceOnlyNumbers(event)" required /></div>
+                </fieldset>
+                <fieldset><legend>Contact & School Information</legend>
+                    <div class="form-group"><label>Email:</label><input type="email" id="teacherEmail" required /></div>
+                    <div class="form-group"><label>Phone Number:</label><input type="tel" id="teacherPhone" pattern="[0-9]{10}" oninput="enforceOnlyNumbers(event)" required /></div>
+                    <div class="form-group"><label>School Name:</label><input type="text" id="teacherSchoolName" oninput="enforceNoNumbers(event)" required /></div>
+                    <div class="form-group"><label>Registration Year:</label><input type="number" id="teacherYear" placeholder="e.g., 2018" required /></div>
+                </fieldset>
+                <fieldset><legend>Academic Assign</legend>
+                    <div class="form-group"><label>Grade Levels :</label><div class="checkbox-group" id="teacherGradeCheckboxes"></div></div>
+                     <div class="form-group"><label>Subject Specialty:</label><select id="teacherSubjectSpecialty" required><option value="">First select a grade level </option></select></div>
+                    <div id="teacherAssignmentsContainer"></div>
+                    <div class="form-group"><label>Homeroom Assign (Optional):</label><select id="teacherHomeroomSelect"><option value="">Not a Homeroom Teacher</option></select></div>
+                </fieldset>
+                <button type="reset" class="secondary">Clear Form</button>
+                <button type="submit" class="primary" style="margin-top:10px;">Register Teacher</button>
+                <div id="teacherRegisterMsg" style="margin-top:8px;"></div>
+              </form>
+            </div>
+          </div>
+          
+          <div id="registrarEnrollmentSection" class="content-section hidden">
+            <div class="card">
+                <h2>Pending Enrollment Requests</h2>
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                      <thead><tr><th>Name</th><th>Role</th><th>Request Date</th><th>Status</th><th>Actions</th></tr></thead>
+                      <tbody id="enrollmentRequestsTableBody"></tbody>
+                  </table>
+                </div>
+            </div>
+          </div>
+          
+          <div id="registrarPromotionSection" class="content-section hidden">
+            <div class="card">
+              <h2>End-of-Year Student Promotion</h2>
+              <div class="form-group"><label for="promotionGradeSelect">Promote Students From Grade:</label><select id="promotionGradeSelect"></select></div>
+              <button class="primary" onclick="loadStudentsForPromotion('registrar')">Load Students</button>
+              <div id="promotionTableContainer" class="table-responsive" style="margin-top: 15px;"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT OFFICER DASHBOARD -->
+    <div id="transcriptOfficerPage" class="hidden dashboard-page-container">
+      <div class="top-bar"><h1>Transcript Dashboard</h1><button class="secondary" style="margin-left:12px;" onclick="showContactModal()">Add Contact</button></div>
+      <div class="dashboard-menu-icon" onclick="toggleDashboardMenu('transcriptOfficerDashboardNav')">&#9776; Menu</div>
+      <div class="dashboard-layout">
+        <nav class="dashboard-nav" id="transcriptOfficerDashboardNav">
+          <h3>Transcript Menu</h3>
+          <button class="nav-button active" onclick="showTranscriptOfficerSection('transcriptOfficerTranscriptSection')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Generate Transcript
+          </button>
+          <button class="nav-button" onclick="showTranscriptOfficerSection('transcriptOfficerRequestsSection')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 19H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><line x1="10" y1="13" x2="16" y2="13"/><line x1="10" y1="9" x2="16" y2="9"/><path d="M19 21v-2"/><path d="M21 17h-2"/></svg>
+            Transcript Requests
+          </button>
+        </nav>
+        <main class="dashboard-content">
+          <div id="transcriptOfficerTranscriptSection" class="content-section">
+            <div class="card">
+              <h2>Generate Student Academic Transcript</h2>
+              <div class="search-bar">
+                <label for="transcriptStudentSearch">Find Student by Name or ID:</label>
+                <input type="search" id="transcriptStudentSearch" list="studentDatalist" placeholder="Start typing name or ID...">
+                <datalist id="studentDatalist"></datalist>
+              </div>
+              <button class="primary" onclick="generateTranscript()">Generate Transcript</button>
+              <button class="secondary hidden" id="exportCsvBtn" onclick="exportTranscriptToCSV()">Export to CSV</button>
+              <div id="transcriptContainer" style="margin-top: 20px;"></div>
+            </div>
+          </div>
+
+          <div id="transcriptOfficerRequestsSection" class="content-section hidden">
+            <div class="card">
+              <h2>Transcript Requests Management</h2>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Grade</th>
+                      <th>Request Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transcriptRequestsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminPage" class="hidden dashboard-page-container">
+      <div class="top-bar"><h1>Admin Dashboard</h1><button class="secondary" style="margin-left:12px;" onclick="showContactModal()">Add Contact</button></div>
+      <div class="dashboard-menu-icon" onclick="toggleDashboardMenu('adminDashboardNav')">&#9776; Menu</div>
+      <div class="dashboard-layout">
+        <nav class="dashboard-nav" id="adminDashboardNav">
+            <h3>Admin Menu</h3>
+            <button class="nav-button" onclick="showAdminSection('allStudentsSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>All Students</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('allTeachersSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                <span>All Teachers</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('enrollmentRequestsSection')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+              <span>Enrollment Requests</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('viewScoresSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Class marks</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('viewCommentsSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Comments</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('promotionSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <span>Student Promotion</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('teacherPromotionSection')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="15" r="3"/><circle cx="9" cy="7" r="4"/><path d="M12 22v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M21.7 16.4a2.5 2.5 0 0 0-3.4 0M14.3 20.6a2.5 2.5 0 0 0 3.4 0"/></svg>
+              <span>Teacher Re-Assign</span>
+            </button>
+            <button class="nav-button" onclick="showReportModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 12v5h10v-5"/><path d="M7 7v2h10V7"/><path d="M12 3v4"/></svg>
+              <span>System Report</span>
+            </button>
+            <button class="nav-button" onclick="showAdminSection('settingsSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+            </button>
+              <button class="nav-button" onclick="showAdminSection('finalReportsSection')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/><path d="M7 10l5-3 5 3"/><path d="M12 22V13"/></svg>
+                <span>Final Semester Reports</span>
+              </button>
+        </nav>
+        <main class="dashboard-content" id="adminDashboardContent">
+            <div id="allStudentsSection" class="content-section">
+                <div class="card">
+                  <h2>All Students</h2>
+                  <div class="filter-controls"><label for="gradeFilterSelect">Filter by Grade:</label><select id="gradeFilterSelect" onchange="applyStudentFilters()"><option value="all">All Grades</option><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option></select></div>
+                  <div class="search-bar"><input type="search" id="studentSearch" onkeyup="applyStudentFilters()" placeholder="Search by Student Name or ID..."></div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                      <thead><tr><th><input type="checkbox" onclick="toggleAllCheckboxes(this, 'studentCheckbox')"></th><th>ID</th><th>Name</th><th>Gender</th><th>Grade</th><th>Section</th><th>Stream</th><th>Year</th><th>Emergency Contact</th><th>Actions</th></tr></thead>
+                      <tbody id="studentsTableBody"></tbody>
+                    </table>
+                  </div>
+                  
+                  <div class="bulk-actions"><select id="studentBulkAction"><option value="">Select Action</option><option value="delete">Delete Selected</option></select><button class="secondary" onclick="applyBulkAction('student')">Apply</button></div>
+                  <button onclick="showAdminSection('adminStudentRegistrationSection')" class="primary" style="margin-top: 15px">Add New Student</button>
+                </div>
+            </div>
+            
+            <div id="adminStudentRegistrationSection" class="content-section hidden">
+               <div class="card">
+                  <h2>Register Student</h2>
+                  <form onsubmit="registerStudent(event)"></form>
+               </div>
+            </div>
+           
+            <div id="allTeachersSection" class="content-section hidden">
+                <div class="card">
+                  <h2>All Teachers</h2>
+                  <div class="search-bar"><input type="search" id="teacherSearch" onkeyup="filterTable('teacherSearch', 'teachersTableBody')" placeholder="Search by Teacher Name or ID..."></div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                      <thead><tr><th><input type="checkbox" onclick="toggleAllCheckboxes(this, 'teacherCheckbox')"></th><th>ID</th><th>Name</th><th>Email</th><th>Subject</th><th>Assignments</th><th>Homeroom</th><th>Year</th><th>Actions</th></tr></thead>
+                      <tbody id="teachersTableBody"></tbody>
+                    </table>
+                  </div>
+                  <div class="bulk-actions"><select id="teacherBulkAction"><option value="">Select Action</option><option value="delete">Delete Selected</option></select><button class="secondary" onclick="applyBulkAction('teacher')">Apply</button></div>
+                  <button onclick="showAdminSection('adminTeacherRegistrationSection')" class="primary" style="margin-top: 15px">Add New Teacher</button>
+                </div>
+            </div>
+            
+            <div id="adminTeacherRegistrationSection" class="content-section hidden">
+                <div class="card">
+                   <h2>Register New Teacher</h2>
+                   <form onsubmit="registerTeacher(event)"></form>
+                </div>
+            </div>
+
+            <div id="enrollmentRequestsSection" class="content-section hidden">
+                <div class="card">
+                    <h2>Pending Enrollment Requests</h2>
+                    <div class="table-responsive" id="enrollmentRequestsContainer"></div>
+                </div>
+            </div>
+
+            <div id="viewScoresSection" class="content-section hidden">
+                <div class="card">
+                    <h2>View Scores by Class</h2>
+                    <div class="form-group inline">
+                        <div><label for="adminScoreViewGrade">Select Grade:</label><select id="adminScoreViewGrade" onchange="populateAdminScoreViewSections(this.value)"></select></div>
+                        <div><label for="adminScoreViewSection">Select Section:</label><select id="adminScoreViewSection"></select></div>
+                    </div>
+                    <button class="primary" onclick="viewScoresByClass()">View result</button>
+                    <div id="adminScoresTableContainer" class="table-responsive" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <div id="finalReportsSection" class="content-section hidden">
+              <div class="card">
+                <h2>Final Semester Reports (Submitted by Homeroom Teachers)</h2>
+                <div class="form-group inline">
+                  <div><label for="adminFinalReportGrade">Select Grade:</label><select id="adminFinalReportGrade" onchange="populateAdminFinalReportSections(this.value)"><option value="">All Grades</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></div>
+                  <div><label for="adminFinalReportSection">Select Section:</label><select id="adminFinalReportSection"><option value="">All Sections</option></select></div>
+                </div>
+                <div style="margin-top:8px; display:flex; gap:8px;"><button class="primary" onclick="renderAdminFinalReports()">Filter</button><button class="secondary" onclick="renderAdminFinalReports(true)">Show All</button></div>
+                <div id="adminFinalReportsContainer" style="margin-top:12px;"></div>
+              </div>
+            </div>
+            
+            <div id="viewCommentsSection" class="content-section hidden">
+                <div class="card">
+                    <h2>All Comments</h2>
+                    <div class="search-bar"><input type="search" id="commentSearch" onkeyup="filterTable('commentSearch', 'commentsTableBody')" placeholder="Search by Student, Teacher, or Status..."></div>
+                    <div class="table-responsive">
+                      <table class="table table-striped table-hover">
+                          <thead><tr><th>Student</th><th>Teacher (Subject)</th><th>Comment</th><th>Response</th><th>Status</th><th>Actions</th></tr></thead>
+                          <tbody id="commentsTableBody"></tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="promotionSection" class="content-section hidden">
+                <div class="card">
+                  <h2>End-of-Year Student Promotion</h2>
+                  <div class="form-group"><label for="promotionGradeSelectAdmin">Promote Students From Grade:</label><select id="promotionGradeSelectAdmin"></select></div>
+                  <button class="primary" onclick="loadStudentsForPromotion('admin')">Load Students</button>
+                  <div id="promotionTableContainerAdmin" class="table-responsive" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <div id="teacherPromotionSection" class="content-section hidden">
+                <div class="card">
+                  <h2>End-of-Year Teacher Re-Assignment</h2>
+                  <div class="form-group"><label for="teacherPromotionGradeSelectAdmin">View Teachers Assigned to Grade:</label><select id="teacherPromotionGradeSelectAdmin"></select></div>
+                  <button class="primary" onclick="loadTeachersForPromotion('admin')">Load Teachers</button>
+                  <div id="teacherPromotionTableContainerAdmin" class="table-responsive" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <div id="settingsSection" class="content-section hidden">
+                <div class="card">
+                    <h2>System Settings</h2>
+                    <form onsubmit="updateSystemSettings(event)">
+                        <fieldset><legend>Enrollment Settings</legend>
+                            <div class="checkbox-group" style="grid-template-columns: 1fr;">
+                                <div><input type="checkbox" id="enableStudentEnrollment"><label for="enableStudentEnrollment">Enable Student Enrollment</label></div>
+                                <div><input type="checkbox" id="enableTeacherEnrollment"><label for="enableTeacherEnrollment">Enable Teacher Enrollment</label></div>
+                            </div>
+                        </fieldset>
+                        <fieldset><legend>Registrar Settings</legend>
+                            <div class="checkbox-group" style="grid-template-columns: 1fr;">
+                                <div><input type="checkbox" id="enableRegistrarLogin"><label for="enableRegistrarLogin">Enable Registrar Login</label></div>
+                            </div>
+                        </fieldset>
+                            <fieldset><legend>Admin Signup</legend>
+                              <div class="checkbox-group" style="grid-template-columns: 1fr;">
+                                <div><input type="checkbox" id="enableAdminSignup"><label for="enableAdminSignup">Enable Admin Sign Up (public)</label></div>
+                              </div>
+                            </fieldset>
+                        <fieldset><legend>Admission Scores (Grade 9 Entry)</legend>
+                            <label>Minimum Score for Male Students:</label><input type="number" id="admissionScoreMale" min="0" max="100" required />
+                            <label>Minimum Score for Female Students:</label><input type="number" id="admissionScoreFemale" min="0" max="100" required />
+                        </fieldset>
+                        <fieldset><legend>Section Assignment</legend>
+                          <div><input type="checkbox" id="autoAssignSection"><label for="autoAssignSection">Auto-assign Section on Student Registration</label></div>
+                          <label>Max Students Per Section (Grade 9):</label><input type="number" id="maxStudentsPerSectionGrade9" min="1" value="30" />
+                          <label>Max Students Per Section (Grade 10):</label><input type="number" id="maxStudentsPerSectionGrade10" min="1" value="30" />
+                          <label>Max Students Per Section (Grade 11):</label><input type="number" id="maxStudentsPerSectionGrade11" min="1" value="30" />
+                          <label>Max Students Per Section (Grade 12):</label><input type="number" id="maxStudentsPerSectionGrade12" min="1" value="30" />
+                        </fieldset>
+                        <fieldset><legend>Yearly Pass Marks</legend>
+                            <label>Overall Pass Mark for Grade 9:</label><input type="number" id="passMarkGrade9" min="0" max="100" required />
+                            <label>Overall Pass Mark for Grade 10:</label><input type="number" id="passMarkGrade10" min="0" max="100" required />
+                            <label>Overall Pass Mark for Grade 11:</label><input type="number" id="passMarkGrade11" min="0" max="100" required />
+                            <label>Overall Pass Mark for Grade 12:</label><input type="number" id="passMarkGrade12" min="0" max="100" required />
+                        </fieldset>
+                         <fieldset><legend>Maximum Failed Subjects (Yearly)</legend>
+                            <label>Grade 9 Max Failures:</label><input type="number" id="maxFailGrade9" min="0" max="10" required />
+                            <label>Grade 10 Max Failures:</label><input type="number" id="maxFailGrade10" min="0" max="10" required />
+                            <label>Grade 11 Max Failures:</label><input type="number" id="maxFailGrade11" min="0" max="10" required />
+                            <label>Grade 12 Max Failures:</label><input type="number" id="maxFailGrade12" min="0" max="10" required />
+                        </fieldset>
+                        <button type="submit" class="primary" style="margin-top: 10px;">Save All Settings</button>
+                        <div id="settingsMsg" style="margin-top: 8px; color: green;"></div>
+                    </form>
+                     <fieldset><legend>Manage Sections</legend>
+                        <div class="inline"><select id="sectionGradeSelect" onchange="populateSectionManagementList(this.value)"></select></div>
+                        <div class="inline"><input type="text" id="newSectionName" placeholder="New Section Name"><button class="secondary" type="button" onclick="addSection()">Add Section</button></div>
+                        <div id="sectionList" class="item-list"></div>
+                    </fieldset>
+                    <fieldset><legend>Manage Subjects</legend>
+                        <div class="inline"><select id="subjectGradeSelect" onchange="populateSubjectManagementList()"></select><select id="subjectStreamSelect" class="hidden" onchange="populateSubjectManagementList()"><option value="Natural Science">Natural Science</option><option value="Social Science">Social Science</option></select></div>
+                        <div class="inline"><input type="text" id="newSubjectName" placeholder="New Subject Name"><button class="secondary" type="button" onclick="addSubject()">Add Subject</button></div>
+                        <div id="subjectList" class="item-list"></div>
+                    </fieldset>
+                    <fieldset><legend>Manage Registrars</legend>
+                        <form onsubmit="addRegistrar(event)" style="margin-bottom: 15px;">
+                            <div class="inline">
+                                <input type="text" id="newRegistrarUsername" placeholder="New Registrar Username" required>
+                                <input type="password" id="newRegistrarPassword" placeholder="New Registrar Password" required>
+                                <button type="submit" class="primary">Add 

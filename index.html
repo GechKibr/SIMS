@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A+SIS Login</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+<header>
+    <div class="logo">A<SUP>+</SUP>SIS</div>
+    <nav>
+        <a href="/index.html">Login</a>
+        <a href="/dashboard.php">Dashboard</a>
+    </nav>
+</header>
+
+<main>
+    <section class="login-wrapper">
+        <div class="login-container">
+            <h1 class="login-title"><b>Login</b> System</h1>
+            <form id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" autocomplete="username" required />
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required />
+
+                <button type="submit" id="loginSubmitBtn" class="primary">Sign In</button>
+                <div id="loginMessage" class="login-message" aria-live="polite"></div>
+            </form>
+        </div>
+
+        <aside class="login-aside">
+            <h2>Student Information Management System</h2>
+            <p>
+                Access student services, teaching tools, registrar workflows, and transcript processing
+                with one secure account.
+            </p>
+            <div class="hint-box">
+                <strong>Default Admin</strong>
+                Username: admin<br />
+                Password: admin123
+            </div>
+        </aside>
+    </section>
+</main>
+
+<footer>
+    Student Information Management System | A+SIS
+</footer>
+
+<script src="/assets/app.js"></script>
+</body>
+</html>
