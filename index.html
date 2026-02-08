@@ -24,7 +24,15 @@
                 <input type="text" id="username" name="username" autocomplete="username" required />
 
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="current-password" required />
+                <div class="password-field">
+                    <input type="password" id="password" name="password" autocomplete="current-password" required />
+                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M1.5 12s4-6.5 10.5-6.5S22.5 12 22.5 12s-4 6.5-10.5 6.5S1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="1.6" />
+                            <circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                    </button>
+                </div>
 
                 <button type="submit" id="loginSubmitBtn" class="primary">Sign In</button>
                 <div id="loginMessage" class="login-message" aria-live="polite"></div>

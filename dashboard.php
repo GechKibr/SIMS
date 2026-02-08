@@ -28,6 +28,14 @@ $roleLabels = [
 
 $roleLabel = $roleLabels[$role] ?? 'User';
 $fullName = $user['full_name'] ?: $user['username'];
+$rolePages = [
+    'student' => '/student.php',
+    'teacher' => '/teacher.php',
+    'system_admin' => '/admin.php',
+    'registrar_officer' => '/registrar.php',
+    'transcript_officer' => '/transcript.php',
+];
+$rolePage = $rolePages[$role] ?? '/dashboard.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,6 +61,7 @@ $fullName = $user['full_name'] ?: $user['username'];
             <small><?php echo htmlspecialchars($roleLabel); ?></small>
         </div>
         <button class="active" type="button">Overview</button>
+        <a class="nav-link" href="<?php echo htmlspecialchars($rolePage); ?>">Open Role Page</a>
         <button type="button">My Profile</button>
         <button type="button">Notifications</button>
         <button type="button" id="logoutBtn">Sign Out</button>

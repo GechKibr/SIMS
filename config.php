@@ -1,7 +1,5 @@
 <?php
 return [
-    'db_host' => 'localhost',
-    'db_name' => 'sim_db',
-    'db_user' => 'root',
-    'db_pass' => '',
+    'db_driver' => 'sqlite',
+    'sqlite_path' => __DIR__ . '/data/sims.sqlite',
 ];

@@ -40,7 +40,17 @@ $_SESSION['username'] = $user['username'];
 $_SESSION['role'] = $user['role'];
 $_SESSION['full_name'] = $user['full_name'];
 
-$update = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?');
+$update = $pdo->prepare('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?');
 $update->execute([(int) $user['id']]);
 
-echo json_encode(['ok' => true, 'redirect' => '/dashboard.php']);
+$roleRedirects = [
+    'student' => '/student.php',
+    'teacher' => '/teacher.php',
+    'system_admin' => '/admin.php',
+    'registrar_officer' => '/registrar.php',
+    'transcript_officer' => '/transcript.php',
+];
+
+$redirect = $roleRedirects[$user['role']] ?? '/dashboard.php';
+
+echo json_encode(['ok' => true, 'redirect' => $redirect]);
