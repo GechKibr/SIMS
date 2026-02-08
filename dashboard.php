@@ -6,6 +6,13 @@ require_once __DIR__ . '/lib/db.php';
 session_start();
 ensure_schema();
 
+// Check session timeout
+if (check_session_timeout()) {
+    session_destroy();
+    header('Location: /index.html?timeout=1');
+    exit;
+}
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: /index.html');
     exit;
@@ -14,6 +21,13 @@ if (!isset($_SESSION['user_id'])) {
 $user = get_user_by_id((int) $_SESSION['user_id']);
 if (!$user) {
     header('Location: /index.html');
+    exit;
+}
+
+// Check if user is still active
+if (!$user['is_active']) {
+    session_destroy();
+    header('Location: /index.html?deactivated=1');
     exit;
 }
 
@@ -28,37 +42,41 @@ $roleLabels = [
 
 $roleLabel = $roleLabels[$role] ?? 'User';
 $fullName = $user['full_name'] ?: $user['username'];
+$csrfToken = generate_csrf_token();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>A+SIS Dashboard</title>
+    <meta name="description" content="A+SIS Dashboard - Access your personalized student information management tools" />
+    <title>A+SIS Dashboard - <?php echo htmlspecialchars($roleLabel); ?></title>
     <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 <body>
-<header>
-    <div class="logo">A<SUP>+</SUP>SIS</div>
-    <nav>
-        <a href="/dashboard.php">Dashboard</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header role="banner">
+    <div class="logo" aria-label="A+SIS - Student Information Management System">A<SUP>+</SUP>SIS</div>
+    <nav role="navigation" aria-label="Main navigation">
+        <a href="/dashboard.php" aria-current="page">Dashboard</a>
         <a href="/index.html">Login</a>
     </nav>
 </header>
 
 <section class="dashboard-layout">
-    <aside class="dashboard-nav">
+    <aside class="dashboard-nav" role="navigation" aria-label="Dashboard navigation">
         <div>
             <strong><?php echo htmlspecialchars($fullName); ?></strong><br />
             <small><?php echo htmlspecialchars($roleLabel); ?></small>
         </div>
-        <button class="active" type="button">Overview</button>
+        <button class="active" type="button" aria-current="page">Overview</button>
         <button type="button">My Profile</button>
         <button type="button">Notifications</button>
         <button type="button" id="logoutBtn">Sign Out</button>
     </aside>
 
-    <div class="dashboard-content">
+    <div class="dashboard-content" id="main-content" role="main">
         <div class="dashboard-card">
             <h3>Quick Actions</h3>
             <p>Shortcuts for your daily tasks.</p>
@@ -137,10 +155,14 @@ $fullName = $user['full_name'] ?: $user['username'];
     </div>
 </section>
 
-<footer>
-    Student Information Management System | A+SIS
+<footer role="contentinfo">
+    Student Information Management System | A+SIS &copy; 2024
 </footer>
 
+<script>
+    // Pass CSRF token to JavaScript
+    window.CSRF_TOKEN = '<?php echo $csrfToken; ?>';
+</script>
 <script src="/assets/dashboard.js"></script>
 </body>
 </html>

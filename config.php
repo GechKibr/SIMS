@@ -1,7 +1,7 @@
 <?php
 return [
-    'db_host' => 'localhost',
-    'db_name' => 'sim_db',
-    'db_user' => 'root',
-    'db_pass' => '',
+    'db_path' => __DIR__ . '/data/sims.db',
+    'session_timeout' => 1800, // 30 minutes
+    'max_login_attempts' => 5,
+    'lockout_duration' => 900, // 15 minutes
 ];

@@ -1,8 +1,15 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../lib/db.php';
+
 session_start();
 header('Content-Type: application/json');
+
+// Log logout if user is authenticated
+if (isset($_SESSION['user_id'])) {
+    log_audit((int) $_SESSION['user_id'], 'logout', 'session', null, 'User logged out');
+}
 
 $_SESSION = [];
 

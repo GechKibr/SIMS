@@ -3,41 +3,63 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A+SIS Student Information Management System - Secure login portal for students, teachers, and administrators" />
     <title>A+SIS Login</title>
     <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 <body>
-<header>
-    <div class="logo">A<SUP>+</SUP>SIS</div>
-    <nav>
-        <a href="/index.html">Login</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header role="banner">
+    <div class="logo" aria-label="A+SIS - Student Information Management System">A<SUP>+</SUP>SIS</div>
+    <nav role="navigation" aria-label="Main navigation">
+        <a href="/index.html" aria-current="page">Login</a>
         <a href="/dashboard.php">Dashboard</a>
     </nav>
 </header>
 
-<main>
+<main id="main-content" role="main">
     <section class="login-wrapper">
         <div class="login-container">
             <h1 class="login-title"><b>Login</b> System</h1>
-            <form id="loginForm">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" autocomplete="username" required />
+            <form id="loginForm" aria-label="Login form">
+                <label for="username">Username <span class="sr-only">(required)</span></label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    autocomplete="username" 
+                    required 
+                    aria-required="true"
+                    aria-describedby="loginMessage"
+                    minlength="3"
+                    maxlength="50"
+                />
 
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="current-password" required />
+                <label for="password">Password <span class="sr-only">(required)</span></label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    autocomplete="current-password" 
+                    required 
+                    aria-required="true"
+                    aria-describedby="loginMessage"
+                    minlength="6"
+                />
 
                 <button type="submit" id="loginSubmitBtn" class="primary">Sign In</button>
-                <div id="loginMessage" class="login-message" aria-live="polite"></div>
+                <div id="loginMessage" class="login-message" role="alert" aria-live="polite"></div>
             </form>
         </div>
 
-        <aside class="login-aside">
+        <aside class="login-aside" role="complementary">
             <h2>Student Information Management System</h2>
             <p>
                 Access student services, teaching tools, registrar workflows, and transcript processing
                 with one secure account.
             </p>
-            <div class="hint-box">
+            <div class="hint-box" role="note">
                 <strong>Default Admin</strong>
                 Username: admin<br />
                 Password: admin123
@@ -46,8 +68,8 @@
     </section>
 </main>
 
-<footer>
-    Student Information Management System | A+SIS
+<footer role="contentinfo">
+    Student Information Management System | A+SIS &copy; 2024
 </footer>
 
 <script src="/assets/app.js"></script>
